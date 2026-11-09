@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// طرف حساب‌ها (اشخاصی که با آنها حساب کتاب داریم)
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  note      String?
+  createdAt DateTime @default(now())
+  entries   Entry[]
+}
+
+// تراکنش‌های هر طرف حساب
+// debit  = بدهکار (پولی که به او داده‌ایم)
+// credit = بستانکار (پولی که از او گرفته‌ایم)
+model Entry {
+  id          Int      @id @default(autoincrement())
+  contactId   Int
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  date        String // تاریخ شمسی با فرمت "1404/08/18"
+  description String?
+  debit       Float    @default(0)
+  credit      Float    @default(0)
+  createdAt   DateTime @default(now())
+
+  @@index([contactId])
+  @@index([date])
+}
